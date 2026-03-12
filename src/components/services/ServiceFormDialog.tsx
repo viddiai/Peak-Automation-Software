@@ -49,6 +49,7 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
     responsible: '',
     category: 'Produktivitet' as Category,
     status: 'active' as ServiceStatus,
+    url: '',
     tags: '',
   });
 
@@ -66,6 +67,7 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
         responsible: service.responsible,
         category: service.category,
         status: service.status,
+        url: service.url || '',
         tags: service.tags.join(', '),
       });
     } else {
@@ -81,6 +83,7 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
         responsible: '',
         category: 'Produktivitet',
         status: 'active',
+        url: '',
         tags: '',
       });
     }
@@ -101,6 +104,7 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
       responsible: form.responsible,
       category: form.category,
       status: form.status,
+      url: form.url || null,
       tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
       notes: service?.notes || [],
       costHistory: service?.costHistory || [],
@@ -235,6 +239,16 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>URL</Label>
+            <Input
+              type="url"
+              value={form.url}
+              onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
+              placeholder="t.ex. https://slack.com"
+            />
           </div>
 
           <div className="space-y-2">

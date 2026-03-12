@@ -53,6 +53,7 @@ export interface SaaSService {
   tags: string[];
   notes: ServiceNote[];
   costHistory: CostHistoryEntry[];
+  url: string | null; // service URL
   logoColor: string; // hex color for placeholder logo
   createdAt: string;
 }
