@@ -161,6 +161,7 @@ export function Import() {
             currency: 'SEK',
             description: 'Import från CSV',
           }],
+          url: null,
           logoColor: `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`,
           createdAt: new Date().toISOString().split('T')[0],
         };
