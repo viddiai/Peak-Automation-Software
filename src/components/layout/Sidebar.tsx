@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard,
   Server,
@@ -6,6 +7,7 @@ import {
   PiggyBank,
   Settings,
   Sparkles,
+  LogOut,
 } from 'lucide-react';
 
 const navItems = [
@@ -17,6 +19,8 @@ const navItems = [
 ];
 
 export function Sidebar() {
+  const { user, signOut } = useAuth();
+
   return (
     <aside className="hidden md:flex flex-col w-[260px] border-r border-border bg-sidebar h-screen sticky top-0">
       {/* Brand */}
@@ -47,7 +51,7 @@ export function Sidebar() {
           >
             {({ isActive }) => (
               <>
-                <div className={`relative ${isActive ? '' : ''}`}>
+                <div className="relative">
                   <item.icon className={`w-[18px] h-[18px] transition-colors ${isActive ? 'text-aurora-cyan' : 'text-muted-foreground group-hover:text-foreground'}`} />
                   {isActive && (
                     <div className="absolute -inset-1.5 bg-aurora-cyan/20 rounded-lg blur-md -z-10" />
@@ -60,11 +64,35 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer */}
-      <div className="px-6 py-4 border-t border-border">
-        <p className="text-[11px] font-medium tracking-wider uppercase text-muted-foreground/60">
-          PeakAutomation AB
-        </p>
+      {/* User + logout */}
+      <div className="px-4 py-4 border-t border-border">
+        {user && (
+          <div className="flex items-center gap-3">
+            {user.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt=""
+                referrerPolicy="no-referrer"
+                className="w-8 h-8 rounded-full shrink-0 border border-border"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-aurora-cyan/15 flex items-center justify-center shrink-0 text-aurora-cyan text-xs font-bold">
+                {(user.displayName || user.email || '?')[0].toUpperCase()}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{user.displayName || 'Användare'}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
+            </div>
+            <button
+              onClick={signOut}
+              className="shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-aurora-rose hover:bg-aurora-rose/10 transition-colors"
+              title="Logga ut"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

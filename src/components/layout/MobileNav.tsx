@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard,
   Server,
   Upload,
   PiggyBank,
-  Settings,
+  LogOut,
 } from 'lucide-react';
 
 const navItems = [
@@ -12,10 +13,11 @@ const navItems = [
   { to: '/tjanster', label: 'Tjänster', icon: Server },
   { to: '/importera', label: 'Import', icon: Upload },
   { to: '/besparingar', label: 'Spara', icon: PiggyBank },
-  { to: '/installningar', label: 'Inställ.', icon: Settings },
 ];
 
 export function MobileNav() {
+  const { signOut } = useAuth();
+
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border"
          style={{
@@ -51,6 +53,13 @@ export function MobileNav() {
             )}
           </NavLink>
         ))}
+        <button
+          onClick={signOut}
+          className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-[10px] font-medium text-muted-foreground transition-all duration-200"
+        >
+          <LogOut className="w-5 h-5" />
+          <span>Logga ut</span>
+        </button>
       </div>
     </nav>
   );
