@@ -21,12 +21,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Label } from '@/components/ui/label';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Upload, FileSpreadsheet, Check, X, ArrowRight, Plus } from 'lucide-react';
 import type { CSVRow, ColumnMapping, ImportPreviewRow, SaaSService } from '@/types';
 
 type ImportStep = 'upload' | 'map' | 'preview' | 'done';
 
-// Common SaaS keywords for auto-detection
 const SERVICE_KEYWORDS: Record<string, string> = {
   slack: 'Slack',
   microsoft: 'Microsoft 365',
@@ -90,7 +90,6 @@ export function Import() {
         if (results.data.length > 0) {
           setRawData(results.data);
           setHeaders(Object.keys(results.data[0]));
-          // Auto-detect column mapping
           const h = Object.keys(results.data[0]);
           const dateCol = h.find(c => /datum|date|bokf/i.test(c)) || '';
           const descCol = h.find(c => /besk|desc|text|info|mott/i.test(c)) || '';
@@ -111,7 +110,6 @@ export function Import() {
         const date = row[mapping.date] || '';
         const suggestedName = detectServiceName(desc);
 
-        // Try to match existing service
         const matched = services.find(s =>
           s.name.toLowerCase() === suggestedName.toLowerCase() ||
           desc.toLowerCase().includes(s.name.toLowerCase())
@@ -192,27 +190,34 @@ export function Import() {
     setImportedCount(0);
   };
 
+  const steps = ['Ladda upp', 'Mappa kolumner', 'Förhandsgranska', 'Klart'];
+  const stepKeys = ['upload', 'map', 'preview', 'done'];
+  const stepIdx = stepKeys.indexOf(step);
+
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-5xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold">Importera</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Importera kontoutdrag eller bokföringsexport (CSV) för att identifiera prenumerationer
-        </p>
-      </div>
+      <PageHeader
+        title="Importera"
+        subtitle="Importera kontoutdrag eller bokföringsexport (CSV) för att identifiera prenumerationer"
+      />
 
       {/* Steps indicator */}
-      <div className="flex items-center gap-2 text-sm">
-        {['Ladda upp', 'Mappa kolumner', 'Förhandsgranska', 'Klart'].map((label, i) => {
-          const stepIdx = ['upload', 'map', 'preview', 'done'].indexOf(step);
+      <div className="flex items-center gap-2 text-sm animate-in-2">
+        {steps.map((label, i) => {
           const isActive = i === stepIdx;
           const isDone = i < stepIdx;
           return (
             <div key={label} className="flex items-center gap-2">
-              {i > 0 && <ArrowRight className="w-4 h-4 text-muted-foreground" />}
+              {i > 0 && <ArrowRight className="w-4 h-4 text-muted-foreground/40" />}
               <Badge
                 variant={isActive ? 'default' : isDone ? 'default' : 'secondary'}
-                className={isActive ? 'bg-emerald-600' : isDone ? 'bg-emerald-100 text-emerald-700' : ''}
+                className={
+                  isActive
+                    ? 'bg-aurora-cyan text-background font-semibold'
+                    : isDone
+                    ? 'bg-aurora-teal/15 text-aurora-teal border-0'
+                    : 'bg-white/[0.04] text-muted-foreground border-0'
+                }
               >
                 {isDone ? <Check className="w-3 h-3 mr-1" /> : null}
                 {label}
@@ -224,11 +229,13 @@ export function Import() {
 
       {/* Step: Upload */}
       {step === 'upload' && (
-        <Card>
+        <Card className="glass-card animate-in-3">
           <CardContent className="pt-6">
-            <div className="border-2 border-dashed border-border rounded-lg p-12 text-center">
-              <FileSpreadsheet className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium mb-2">Ladda upp CSV-fil</p>
+            <div className="border-2 border-dashed border-border/40 rounded-2xl p-12 text-center hover:border-aurora-cyan/30 transition-colors">
+              <div className="w-16 h-16 rounded-2xl bg-aurora-cyan/10 flex items-center justify-center mx-auto mb-5">
+                <FileSpreadsheet className="w-8 h-8 text-aurora-cyan" />
+              </div>
+              <p className="font-serif text-xl mb-2">Ladda upp CSV-fil</p>
               <p className="text-sm text-muted-foreground mb-6">
                 Dra och släpp en CSV-fil eller klicka för att välja
               </p>
@@ -239,7 +246,7 @@ export function Import() {
                   className="hidden"
                   onChange={handleFileUpload}
                 />
-                <span className="inline-flex items-center justify-center gap-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-medium cursor-pointer">
+                <span className="inline-flex items-center justify-center gap-2 rounded-xl bg-aurora-cyan hover:bg-aurora-cyan/90 text-background px-5 py-2.5 text-sm font-semibold cursor-pointer shadow-lg glow-cyan transition-all">
                   <Upload className="w-4 h-4" /> Välj fil
                 </span>
               </label>
@@ -250,9 +257,9 @@ export function Import() {
 
       {/* Step: Map columns */}
       {step === 'map' && (
-        <Card>
+        <Card className="glass-card animate-in-3">
           <CardHeader>
-            <CardTitle className="text-base">Mappa kolumner</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Mappa kolumner</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
@@ -261,27 +268,27 @@ export function Import() {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label>Datum</Label>
+                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Datum</Label>
                 <Select value={mapping.date} onValueChange={v => setMapping(m => ({ ...m, date: v ?? '' }))}>
-                  <SelectTrigger><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
+                  <SelectTrigger className="bg-white/[0.04] border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
                   <SelectContent>
                     {headers.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Beskrivning *</Label>
+                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Beskrivning *</Label>
                 <Select value={mapping.description} onValueChange={v => setMapping(m => ({ ...m, description: v ?? '' }))}>
-                  <SelectTrigger><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
+                  <SelectTrigger className="bg-white/[0.04] border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
                   <SelectContent>
                     {headers.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Belopp *</Label>
+                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Belopp *</Label>
                 <Select value={mapping.amount} onValueChange={v => setMapping(m => ({ ...m, amount: v ?? '' }))}>
-                  <SelectTrigger><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
+                  <SelectTrigger className="bg-white/[0.04] border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
                   <SelectContent>
                     {headers.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
                   </SelectContent>
@@ -289,24 +296,23 @@ export function Import() {
               </div>
             </div>
 
-            {/* Preview first 5 rows */}
             {rawData.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium mb-2">Förhandsgranskning (5 första raderna)</p>
-                <div className="overflow-x-auto border border-border rounded-lg">
+                <p className="text-[11px] uppercase tracking-wider font-medium text-muted-foreground mb-2">Förhandsgranskning (5 första)</p>
+                <div className="overflow-x-auto border border-border/30 rounded-xl">
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="border-border/30 hover:bg-transparent">
                         {headers.slice(0, 6).map(h => (
-                          <TableHead key={h} className="text-xs">{h}</TableHead>
+                          <TableHead key={h} className="text-[10px] uppercase tracking-wider">{h}</TableHead>
                         ))}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {rawData.slice(0, 5).map((row, i) => (
-                        <TableRow key={i}>
+                        <TableRow key={i} className="border-border/20">
                           {headers.slice(0, 6).map(h => (
-                            <TableCell key={h} className="text-xs">{row[h]}</TableCell>
+                            <TableCell key={h} className="text-[11px] text-muted-foreground">{row[h]}</TableCell>
                           ))}
                         </TableRow>
                       ))}
@@ -317,9 +323,9 @@ export function Import() {
             )}
 
             <div className="flex gap-3 pt-4">
-              <Button variant="outline" onClick={resetImport}>Börja om</Button>
+              <Button variant="outline" className="border-border/50" onClick={resetImport}>Börja om</Button>
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="bg-aurora-cyan hover:bg-aurora-cyan/90 text-background font-semibold"
                 onClick={generatePreview}
                 disabled={!mapping.description || !mapping.amount}
               >
@@ -332,9 +338,9 @@ export function Import() {
 
       {/* Step: Preview */}
       {step === 'preview' && (
-        <Card>
+        <Card className="glass-card animate-in-3">
           <CardHeader>
-            <CardTitle className="text-base">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Förhandsgranskning ({previewRows.filter(r => r.action !== 'skip').length} att importera)
             </CardTitle>
           </CardHeader>
@@ -342,35 +348,35 @@ export function Import() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Datum</TableHead>
-                    <TableHead>Beskrivning</TableHead>
-                    <TableHead>Belopp</TableHead>
-                    <TableHead>Matchad/Ny tjänst</TableHead>
-                    <TableHead>Åtgärd</TableHead>
+                  <TableRow className="border-border/30 hover:bg-transparent">
+                    <TableHead className="text-[11px] uppercase tracking-wider">Datum</TableHead>
+                    <TableHead className="text-[11px] uppercase tracking-wider">Beskrivning</TableHead>
+                    <TableHead className="text-[11px] uppercase tracking-wider">Belopp</TableHead>
+                    <TableHead className="text-[11px] uppercase tracking-wider">Matchad/Ny tjänst</TableHead>
+                    <TableHead className="text-[11px] uppercase tracking-wider">Åtgärd</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {previewRows.map((row, i) => (
-                    <TableRow key={i} className={row.action === 'skip' ? 'opacity-40' : ''}>
-                      <TableCell className="text-sm">{row.date}</TableCell>
-                      <TableCell className="text-sm max-w-[200px] truncate">{row.description}</TableCell>
-                      <TableCell className="font-medium">{row.amount.toLocaleString('sv-SE')} SEK</TableCell>
+                    <TableRow key={i} className={`border-border/20 ${row.action === 'skip' ? 'opacity-30' : ''}`}>
+                      <TableCell className="text-sm text-muted-foreground tabular-nums">{row.date}</TableCell>
+                      <TableCell className="text-sm max-w-[200px] truncate text-muted-foreground">{row.description}</TableCell>
+                      <TableCell className="font-semibold tabular-nums">{row.amount.toLocaleString('sv-SE')} SEK</TableCell>
                       <TableCell>
                         <span className="text-sm">{row.suggestedServiceName}</span>
                         {row.matchedServiceId && (
-                          <Badge variant="secondary" className="ml-2 text-xs">Befintlig</Badge>
+                          <Badge variant="secondary" className="ml-2 text-[10px] bg-aurora-teal/15 text-aurora-teal border-0">Befintlig</Badge>
                         )}
                       </TableCell>
                       <TableCell>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-xs"
+                          className="text-[11px] border-border/40"
                           onClick={() => toggleAction(i)}
                         >
-                          {row.action === 'match' && <Check className="w-3 h-3 mr-1 text-emerald-600" />}
-                          {row.action === 'create' && <Plus className="w-3 h-3 mr-1 text-blue-600" />}
+                          {row.action === 'match' && <Check className="w-3 h-3 mr-1 text-aurora-teal" />}
+                          {row.action === 'create' && <Plus className="w-3 h-3 mr-1 text-aurora-cyan" />}
                           {row.action === 'skip' && <X className="w-3 h-3 mr-1 text-muted-foreground" />}
                           {row.action === 'match' ? 'Matcha' : row.action === 'create' ? 'Skapa ny' : 'Hoppa över'}
                         </Button>
@@ -381,8 +387,8 @@ export function Import() {
               </Table>
             </div>
             <div className="flex gap-3 p-4">
-              <Button variant="outline" onClick={() => setStep('map')}>Tillbaka</Button>
-              <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleImport}>
+              <Button variant="outline" className="border-border/50" onClick={() => setStep('map')}>Tillbaka</Button>
+              <Button className="bg-aurora-cyan hover:bg-aurora-cyan/90 text-background font-semibold" onClick={handleImport}>
                 Importera {previewRows.filter(r => r.action !== 'skip').length} rader
               </Button>
             </div>
@@ -392,21 +398,21 @@ export function Import() {
 
       {/* Step: Done */}
       {step === 'done' && (
-        <Card>
-          <CardContent className="pt-6 text-center py-12">
-            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-emerald-600" />
+        <Card className="glass-card animate-in-3">
+          <CardContent className="pt-6 text-center py-16">
+            <div className="w-20 h-20 bg-aurora-teal/10 rounded-2xl flex items-center justify-center mx-auto mb-6 glow-teal">
+              <Check className="w-10 h-10 text-aurora-teal" />
             </div>
-            <h2 className="text-xl font-bold mb-2">Import klar!</h2>
-            <p className="text-muted-foreground mb-6">
+            <h2 className="font-serif text-2xl mb-2">Import klar!</h2>
+            <p className="text-muted-foreground mb-8">
               {importedCount} nya tjänster skapades från importen.
             </p>
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={resetImport}>
+              <Button variant="outline" className="border-border/50" onClick={resetImport}>
                 Importera fler
               </Button>
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="bg-aurora-cyan hover:bg-aurora-cyan/90 text-background font-semibold"
                 onClick={() => window.location.href = '/tjanster'}
               >
                 Visa tjänster

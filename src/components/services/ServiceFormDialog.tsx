@@ -25,8 +25,8 @@ const CATEGORIES: Category[] = [
 ];
 
 const RANDOM_COLORS = [
-  '#059669', '#0891b2', '#7c3aed', '#db2777', '#ea580c',
-  '#ca8a04', '#2563eb', '#dc2626', '#4f46e5', '#0d9488',
+  '#38bdf8', '#34d399', '#a78bfa', '#fbbf24', '#f87171',
+  '#fb923c', '#2dd4bf', '#818cf8', '#e879f9', '#22d3ee',
 ];
 
 interface ServiceFormDialogProps {
@@ -115,26 +115,31 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
     onOpenChange(false);
   };
 
+  const inputClass = "bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40";
+  const labelClass = "text-[11px] uppercase tracking-wider text-muted-foreground font-medium";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{service ? 'Redigera tjänst' : 'Lägg till tjänst'}</DialogTitle>
+          <DialogTitle className="font-serif text-xl">{service ? 'Redigera tjänst' : 'Lägg till tjänst'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Namn *</Label>
+              <Label className={labelClass}>Namn *</Label>
               <Input
                 required
+                className={inputClass}
                 value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="t.ex. Slack"
               />
             </div>
             <div className="space-y-2">
-              <Label>Leverantör</Label>
+              <Label className={labelClass}>Leverantör</Label>
               <Input
+                className={inputClass}
                 value={form.vendor}
                 onChange={e => setForm(f => ({ ...f, vendor: e.target.value }))}
                 placeholder="t.ex. Salesforce"
@@ -144,18 +149,20 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Plan</Label>
+              <Label className={labelClass}>Plan</Label>
               <Input
+                className={inputClass}
                 value={form.plan}
                 onChange={e => setForm(f => ({ ...f, plan: e.target.value }))}
                 placeholder="t.ex. Pro"
               />
             </div>
             <div className="space-y-2">
-              <Label>Antal licenser</Label>
+              <Label className={labelClass}>Antal licenser</Label>
               <Input
                 type="number"
                 min={0}
+                className={inputClass}
                 value={form.totalLicenses}
                 onChange={e => setForm(f => ({ ...f, totalLicenses: parseInt(e.target.value) || 0 }))}
               />
@@ -164,19 +171,20 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>Kostnad *</Label>
+              <Label className={labelClass}>Kostnad *</Label>
               <Input
                 type="number"
                 min={0}
                 required
+                className={inputClass}
                 value={form.cost}
                 onChange={e => setForm(f => ({ ...f, cost: parseFloat(e.target.value) || 0 }))}
               />
             </div>
             <div className="space-y-2">
-              <Label>Valuta</Label>
+              <Label className={labelClass}>Valuta</Label>
               <Select value={form.currency} onValueChange={v => { if (v) setForm(f => ({ ...f, currency: v as Currency })); }}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className={inputClass}><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="SEK">SEK</SelectItem>
                   <SelectItem value="EUR">EUR</SelectItem>
@@ -185,9 +193,9 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Betalningsperiod</Label>
+              <Label className={labelClass}>Period</Label>
               <Select value={form.billingCycle} onValueChange={v => { if (v) setForm(f => ({ ...f, billingCycle: v as BillingCycle })); }}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className={inputClass}><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="monthly">Månadsvis</SelectItem>
                   <SelectItem value="quarterly">Kvartalsvis</SelectItem>
@@ -200,16 +208,18 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Förnyelsedatum</Label>
+              <Label className={labelClass}>Förnyelsedatum</Label>
               <Input
                 type="date"
+                className={inputClass}
                 value={form.renewalDate}
                 onChange={e => setForm(f => ({ ...f, renewalDate: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
-              <Label>Ansvarig</Label>
+              <Label className={labelClass}>Ansvarig</Label>
               <Input
+                className={inputClass}
                 value={form.responsible}
                 onChange={e => setForm(f => ({ ...f, responsible: e.target.value }))}
                 placeholder="t.ex. Anna Lindberg"
@@ -219,9 +229,9 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Kategori</Label>
+              <Label className={labelClass}>Kategori</Label>
               <Select value={form.category} onValueChange={v => { if (v) setForm(f => ({ ...f, category: v as Category })); }}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className={inputClass}><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {CATEGORIES.map(c => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
@@ -230,9 +240,9 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label className={labelClass}>Status</Label>
               <Select value={form.status} onValueChange={v => { if (v) setForm(f => ({ ...f, status: v as ServiceStatus })); }}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className={inputClass}><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="active">Aktiv</SelectItem>
                   <SelectItem value="inactive">Inaktiv</SelectItem>
@@ -242,9 +252,10 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
           </div>
 
           <div className="space-y-2">
-            <Label>URL</Label>
+            <Label className={labelClass}>URL</Label>
             <Input
               type="url"
+              className={inputClass}
               value={form.url}
               onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
               placeholder="t.ex. https://slack.com"
@@ -252,8 +263,9 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
           </div>
 
           <div className="space-y-2">
-            <Label>Taggar (kommaseparerade)</Label>
+            <Label className={labelClass}>Taggar (kommaseparerade)</Label>
             <Input
+              className={inputClass}
               value={form.tags}
               onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
               placeholder="t.ex. samarbete, chatt, intern"
@@ -261,10 +273,10 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" className="border-border/50" onClick={() => onOpenChange(false)}>
               Avbryt
             </Button>
-            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
+            <Button type="submit" className="bg-aurora-cyan hover:bg-aurora-cyan/90 text-background font-semibold">
               {service ? 'Spara ändringar' : 'Lägg till'}
             </Button>
           </DialogFooter>

@@ -4,6 +4,7 @@ import { useAppData } from '@/hooks/useAppData';
 import { getMonthlyCostInSEK, formatCurrency } from '@/lib/currency';
 import { ServiceLogo } from '@/components/shared/ServiceLogo';
 import { ServiceFormDialog } from '@/components/services/ServiceFormDialog';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +40,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Search, MoreVertical, Pencil, Trash2, ArrowUpDown } from 'lucide-react';
+import { Search, MoreVertical, Pencil, Trash2, ArrowUpDown, Download } from 'lucide-react';
+import { exportServicesToCSV } from '@/lib/exportCSV';
 import type { SaaSService, Category } from '@/types';
 
 type SortKey = 'name' | 'cost' | 'renewalDate';
@@ -125,40 +127,26 @@ export function Services() {
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Tjänster</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {services.length} tjänster totalt
-          </p>
-        </div>
-        <Button
-          className="bg-emerald-600 hover:bg-emerald-700"
-          onClick={() => {
-            setEditingService(null);
-            setFormOpen(true);
-          }}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Lägg till tjänst
-        </Button>
-      </div>
+      <PageHeader
+        title="Tjänster"
+        subtitle={`${services.length} tjänster totalt`}
+      />
 
       {/* Filters */}
-      <Card>
+      <Card className="glass-card animate-in-2">
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-3">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Sök på namn eller leverantör..."
-                className="pl-9"
+                className="pl-9 bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
             <Select value={categoryFilter} onValueChange={v => setCategoryFilter(v ?? 'all')}>
-              <SelectTrigger className="w-[160px]">
+              <SelectTrigger className="w-[160px] bg-white/[0.04] border-border/50">
                 <SelectValue placeholder="Kategori" />
               </SelectTrigger>
               <SelectContent>
@@ -169,7 +157,7 @@ export function Services() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={v => setStatusFilter(v ?? 'all')}>
-              <SelectTrigger className="w-[130px]">
+              <SelectTrigger className="w-[130px] bg-white/[0.04] border-border/50">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -179,7 +167,7 @@ export function Services() {
               </SelectContent>
             </Select>
             <Select value={responsibleFilter} onValueChange={v => setResponsibleFilter(v ?? 'all')}>
-              <SelectTrigger className="w-[160px]">
+              <SelectTrigger className="w-[160px] bg-white/[0.04] border-border/50">
                 <SelectValue placeholder="Ansvarig" />
               </SelectTrigger>
               <SelectContent>
@@ -189,36 +177,44 @@ export function Services() {
                 ))}
               </SelectContent>
             </Select>
+            <Button
+              variant="outline"
+              className="border-border/50 text-muted-foreground hover:text-foreground hover:border-border ml-auto"
+              onClick={() => exportServicesToCSV(filtered, users, settings)}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Exportera {filtered.length !== services.length ? `(${filtered.length})` : 'CSV'}
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Table */}
-      <Card>
+      <Card className="glass-card animate-in-3">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="border-border/50 hover:bg-transparent">
                   <TableHead className="w-[280px]">
-                    <button className="flex items-center gap-1" onClick={() => toggleSort('name')}>
+                    <button className="flex items-center gap-1 text-[11px] uppercase tracking-wider font-medium" onClick={() => toggleSort('name')}>
                       Tjänst <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </TableHead>
-                  <TableHead>Kategori</TableHead>
+                  <TableHead className="text-[11px] uppercase tracking-wider font-medium">Kategori</TableHead>
                   <TableHead>
-                    <button className="flex items-center gap-1" onClick={() => toggleSort('cost')}>
-                      Kostnad/mån (SEK) <ArrowUpDown className="w-3 h-3" />
+                    <button className="flex items-center gap-1 text-[11px] uppercase tracking-wider font-medium" onClick={() => toggleSort('cost')}>
+                      Kostnad/mån <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </TableHead>
-                  <TableHead>Licenser</TableHead>
+                  <TableHead className="text-[11px] uppercase tracking-wider font-medium">Licenser</TableHead>
                   <TableHead>
-                    <button className="flex items-center gap-1" onClick={() => toggleSort('renewalDate')}>
+                    <button className="flex items-center gap-1 text-[11px] uppercase tracking-wider font-medium" onClick={() => toggleSort('renewalDate')}>
                       Förnyelse <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </TableHead>
-                  <TableHead>Ansvarig</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="text-[11px] uppercase tracking-wider font-medium">Ansvarig</TableHead>
+                  <TableHead className="text-[11px] uppercase tracking-wider font-medium">Status</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -229,39 +225,41 @@ export function Services() {
                   return (
                     <TableRow
                       key={s.id}
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer border-border/30 hover:bg-white/[0.03] transition-colors"
                       onClick={() => navigate(`/tjanster/${s.id}`)}
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <ServiceLogo name={s.name} color={s.logoColor} size="sm" />
                           <div>
-                            <p className="font-medium">{s.name}</p>
-                            <p className="text-xs text-muted-foreground">{s.vendor} · {s.plan}</p>
+                            <p className="font-medium text-sm">{s.name}</p>
+                            <p className="text-[11px] text-muted-foreground">{s.vendor} · {s.plan}</p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className="text-xs">{s.category}</Badge>
+                        <Badge variant="secondary" className="text-[10px] bg-white/[0.06] text-muted-foreground border-0">{s.category}</Badge>
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-semibold text-sm tabular-nums">
                         {formatCurrency(monthlyCost)}
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm">
+                        <span className="text-sm tabular-nums text-muted-foreground">
                           {serviceUsers.length}/{s.totalLicenses}
                         </span>
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-sm text-muted-foreground tabular-nums">
                         {s.renewalDate
                           ? new Date(s.renewalDate).toLocaleDateString('sv-SE')
                           : '—'}
                       </TableCell>
-                      <TableCell className="text-sm">{s.responsible}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{s.responsible}</TableCell>
                       <TableCell>
                         <Badge
                           variant={s.status === 'active' ? 'default' : 'secondary'}
-                          className={s.status === 'active' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : ''}
+                          className={s.status === 'active'
+                            ? 'bg-aurora-teal/15 text-aurora-teal border-0 text-[10px]'
+                            : 'bg-white/[0.06] text-muted-foreground border-0 text-[10px]'}
                         >
                           {s.status === 'active' ? 'Aktiv' : 'Inaktiv'}
                         </Badge>
@@ -269,17 +267,17 @@ export function Services() {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger
-                            className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-muted"
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-white/[0.06] transition-colors"
                             onClick={e => e.stopPropagation()}
                           >
-                            <MoreVertical className="w-4 h-4" />
+                            <MoreVertical className="w-4 h-4 text-muted-foreground" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={e => { e.stopPropagation(); handleEdit(s); }}>
                               <Pencil className="w-4 h-4 mr-2" /> Redigera
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-aurora-rose"
                               onClick={e => { e.stopPropagation(); setDeleteId(s.id); }}
                             >
                               <Trash2 className="w-4 h-4 mr-2" /> Ta bort
@@ -292,7 +290,7 @@ export function Services() {
                 })}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                       Inga tjänster hittades
                     </TableCell>
                   </TableRow>
@@ -321,7 +319,7 @@ export function Services() {
           <AlertDialogFooter>
             <AlertDialogCancel>Avbryt</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-aurora-rose hover:bg-aurora-rose/90 text-white"
               onClick={() => {
                 if (deleteId) deleteService(deleteId);
                 setDeleteId(null);

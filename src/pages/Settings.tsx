@@ -23,7 +23,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Save, RotateCcw } from 'lucide-react';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { Save, RotateCcw, Check } from 'lucide-react';
 import type { Currency } from '@/types';
 
 export function Settings() {
@@ -38,33 +39,32 @@ export function Settings() {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-3xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold">Inställningar</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Hantera applikationsinställningar
-        </p>
-      </div>
+    <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
+      <PageHeader
+        title="Inställningar"
+        subtitle="Hantera applikationsinställningar"
+      />
 
-      <Card>
+      <Card className="glass-card animate-in-2">
         <CardHeader>
-          <CardTitle className="text-base">Företagsinformation</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">Företagsinformation</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Företagsnamn</Label>
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Företagsnamn</Label>
             <Input
+              className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
               value={form.companyName}
               onChange={e => setForm(f => ({ ...f, companyName: e.target.value }))}
             />
           </div>
           <div className="space-y-2">
-            <Label>Standardvaluta</Label>
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Standardvaluta</Label>
             <Select
               value={form.defaultCurrency}
               onValueChange={v => { if (v) setForm(f => ({ ...f, defaultCurrency: v as Currency })); }}
             >
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-[120px] bg-white/[0.04] border-border/50">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -77,9 +77,9 @@ export function Settings() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass-card animate-in-3">
         <CardHeader>
-          <CardTitle className="text-base">Växelkurser (till SEK)</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">Växelkurser (till SEK)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
@@ -87,19 +87,21 @@ export function Settings() {
           </p>
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>1 SEK =</Label>
+              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">1 SEK =</Label>
               <Input
                 type="number"
                 step="0.01"
+                className="bg-white/[0.04] border-border/50"
                 value={form.exchangeRates.SEK}
                 disabled
               />
             </div>
             <div className="space-y-2">
-              <Label>1 EUR =</Label>
+              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">1 EUR =</Label>
               <Input
                 type="number"
                 step="0.01"
+                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
                 value={form.exchangeRates.EUR}
                 onChange={e =>
                   setForm(f => ({
@@ -108,13 +110,14 @@ export function Settings() {
                   }))
                 }
               />
-              <p className="text-xs text-muted-foreground">SEK</p>
+              <p className="text-[11px] text-muted-foreground/60">SEK</p>
             </div>
             <div className="space-y-2">
-              <Label>1 USD =</Label>
+              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">1 USD =</Label>
               <Input
                 type="number"
                 step="0.01"
+                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
                 value={form.exchangeRates.USD}
                 onChange={e =>
                   setForm(f => ({
@@ -123,47 +126,50 @@ export function Settings() {
                   }))
                 }
               />
-              <p className="text-xs text-muted-foreground">SEK</p>
+              <p className="text-[11px] text-muted-foreground/60">SEK</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end animate-in-4">
         <Button
-          className="bg-emerald-600 hover:bg-emerald-700"
+          className="bg-aurora-cyan hover:bg-aurora-cyan/90 text-background font-semibold shadow-lg glow-cyan"
           onClick={handleSave}
         >
-          <Save className="w-4 h-4 mr-2" />
-          {saved ? 'Sparat!' : 'Spara inställningar'}
+          {saved ? (
+            <><Check className="w-4 h-4 mr-2" /> Sparat!</>
+          ) : (
+            <><Save className="w-4 h-4 mr-2" /> Spara inställningar</>
+          )}
         </Button>
       </div>
 
-      <Separator />
+      <Separator className="bg-border/30" />
 
-      <Card className="border-red-200">
+      <Card className="border-aurora-rose/20 glass-card animate-in-5">
         <CardHeader>
-          <CardTitle className="text-base text-red-600">Farozon</CardTitle>
+          <CardTitle className="text-sm font-medium text-aurora-rose">Farozon</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
             Återställ all data till ursprungliga exempelvärden. Alla dina ändringar kommer att raderas.
           </p>
           <AlertDialog>
-            <AlertDialogTrigger className="inline-flex items-center justify-center gap-2 rounded-md bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium">
+            <AlertDialogTrigger className="inline-flex items-center justify-center gap-2 rounded-xl bg-aurora-rose/15 hover:bg-aurora-rose/25 text-aurora-rose px-4 py-2 text-sm font-semibold transition-colors">
               <RotateCcw className="w-4 h-4" /> Återställ all data
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Återställ all data?</AlertDialogTitle>
+                <AlertDialogTitle className="font-serif text-xl">Återställ all data?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Detta tar bort all data och återställer till exempeldata. Åtgärden kan inte ångras.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                <AlertDialogCancel className="border-border/50">Avbryt</AlertDialogCancel>
                 <AlertDialogAction
-                  className="bg-red-600 hover:bg-red-700"
+                  className="bg-aurora-rose hover:bg-aurora-rose/90 text-white"
                   onClick={resetData}
                 >
                   Återställ

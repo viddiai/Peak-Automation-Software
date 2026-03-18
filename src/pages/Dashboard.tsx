@@ -1,23 +1,16 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useAppData } from '@/hooks/useAppData';
 import { getMonthlyCostInSEK, formatCurrency, toYearlyCost } from '@/lib/currency';
 import { ServiceLogo } from '@/components/shared/ServiceLogo';
-import { ServiceFormDialog } from '@/components/services/ServiceFormDialog';
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   Server,
   Users,
   UserX,
   TrendingDown,
   CalendarClock,
-  Plus,
-  Upload,
-  PiggyBank,
-  List,
 } from 'lucide-react';
-import type { SaaSService } from '@/types';
 import {
   BarChart,
   Bar,
@@ -37,16 +30,14 @@ import {
 } from 'recharts';
 import type { Category } from '@/types';
 
-const COLORS = [
-  '#059669', '#0891b2', '#7c3aed', '#db2777', '#ea580c',
-  '#ca8a04', '#2563eb', '#dc2626', '#4f46e5', '#0d9488',
+const CHART_COLORS = [
+  '#38bdf8', '#34d399', '#a78bfa', '#fbbf24', '#f87171',
+  '#fb923c', '#2dd4bf', '#818cf8', '#e879f9', '#22d3ee',
 ];
 
 export function Dashboard() {
-  const navigate = useNavigate();
-  const { services, users, settings, addService } = useAppData();
+  const { services, users, settings } = useAppData();
   const rates = settings.exchangeRates;
-  const [formOpen, setFormOpen] = useState(false);
 
   const activeServices = useMemo(
     () => services.filter(s => s.status === 'active'),
@@ -87,7 +78,6 @@ export function Dashboard() {
     return Math.round(savings);
   }, [activeServices, users, rates]);
 
-  // Cost by service (bar chart)
   const costByService = useMemo(
     () =>
       activeServices
@@ -101,7 +91,6 @@ export function Dashboard() {
     [activeServices, rates]
   );
 
-  // Cost by category (pie chart)
   const costByCategory = useMemo(() => {
     const map = new Map<Category, number>();
     for (const s of activeServices) {
@@ -112,7 +101,6 @@ export function Dashboard() {
       .sort((a, b) => b.value - a.value);
   }, [activeServices, rates]);
 
-  // 12-month historical trend
   const historicalTrend = useMemo(() => {
     const months: { month: string; kostnad: number }[] = [];
     const now = new Date();
@@ -133,7 +121,6 @@ export function Dashboard() {
     return months;
   }, [services, rates]);
 
-  // 12-month forward forecast
   const forecast = useMemo(() => {
     const months: { month: string; prognos: number }[] = [];
     const now = new Date();
@@ -143,11 +130,10 @@ export function Dashboard() {
       let total = 0;
       for (const s of activeServices) {
         const monthly = getMonthlyCostInSEK(s, rates);
-        // Check if renewal date is before this month (service might expire)
         if (s.renewalDate) {
           const renewal = new Date(s.renewalDate);
           if (renewal < d && s.billingCycle !== 'consumption') {
-            // Assume renewal happens (conservative forecast)
+            // Assume renewal (conservative)
           }
         }
         total += monthly;
@@ -157,7 +143,6 @@ export function Dashboard() {
     return months;
   }, [activeServices, rates]);
 
-  // Upcoming renewals
   const upcomingRenewals = useMemo(() => {
     const now = new Date();
     const future = new Date();
@@ -167,94 +152,73 @@ export function Dashboard() {
       .sort((a, b) => new Date(a.renewalDate!).getTime() - new Date(b.renewalDate!).getTime());
   }, [activeServices]);
 
+  const kpis = [
+    {
+      label: 'Aktiva tjänster',
+      value: activeServices.length,
+      icon: Server,
+      color: 'cyan' as const,
+    },
+    {
+      label: 'Totalt licenser',
+      value: totalLicenses,
+      icon: Users,
+      color: 'blue' as const,
+    },
+    {
+      label: 'Inaktiva användare',
+      value: inactiveUsers.length,
+      icon: UserX,
+      color: 'amber' as const,
+    },
+    {
+      label: 'Möjlig besparing/mån',
+      value: formatCurrency(potentialSavings),
+      icon: TrendingDown,
+      color: 'rose' as const,
+    },
+  ];
+
+  const colorMap = {
+    cyan: { bg: 'bg-aurora-cyan/10', text: 'text-aurora-cyan', glow: 'glow-cyan' },
+    blue: { bg: 'bg-aurora-blue/10', text: 'text-aurora-blue', glow: '' },
+    amber: { bg: 'bg-aurora-amber/10', text: 'text-aurora-amber', glow: 'glow-amber' },
+    rose: { bg: 'bg-aurora-rose/10', text: 'text-aurora-rose', glow: 'glow-rose' },
+  };
+
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Översikt</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            SaaS-portföljen för {settings.companyName}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            className="bg-emerald-600 hover:bg-emerald-700"
-            onClick={() => setFormOpen(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" /> Lägg till tjänst
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/tjanster')}>
-            <List className="w-4 h-4 mr-2" /> Alla tjänster
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/importera')}>
-            <Upload className="w-4 h-4 mr-2" /> Importera
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/besparingar')}>
-            <PiggyBank className="w-4 h-4 mr-2" /> Besparingar
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Översikt"
+        subtitle={`SaaS-portföljen för ${settings.companyName}`}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                <Server className="w-5 h-5 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{activeServices.length}</p>
-                <p className="text-xs text-muted-foreground">Aktiva tjänster</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Users className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{totalLicenses}</p>
-                <p className="text-xs text-muted-foreground">Totalt licenser</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                <UserX className="w-5 h-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{inactiveUsers.length}</p>
-                <p className="text-xs text-muted-foreground">Inaktiva användare</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                <TrendingDown className="w-5 h-5 text-red-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{formatCurrency(potentialSavings)}</p>
-                <p className="text-xs text-muted-foreground">Möjlig besparing/mån</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="col-span-2 lg:col-span-1">
+        {kpis.map((kpi, i) => {
+          const c = colorMap[kpi.color];
+          return (
+            <Card key={kpi.label} className={`glass-card animate-in-${i + 2}`}>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl ${c.bg} flex items-center justify-center`}>
+                    <kpi.icon className={`w-5 h-5 ${c.text}`} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold tracking-tight">{kpi.value}</p>
+                    <p className="text-[11px] text-muted-foreground">{kpi.label}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+        <Card className="col-span-2 lg:col-span-1 glass-card animate-in-6">
           <CardContent className="pt-6">
             <div>
-              <p className="text-sm text-muted-foreground">Månadskostnad</p>
-              <p className="text-2xl font-bold text-emerald-600">{formatCurrency(totalMonthlyCost)}</p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Månadskostnad</p>
+              <p className="text-2xl font-bold text-aurora-cyan tracking-tight mt-1">{formatCurrency(totalMonthlyCost)}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 {formatCurrency(toYearlyCost(totalMonthlyCost))}/år
               </p>
             </div>
@@ -264,20 +228,19 @@ export function Dashboard() {
 
       {/* Charts row 1 */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="glass-card animate-in-7">
           <CardHeader>
-            <CardTitle className="text-base">Kostnad per tjänst (SEK/mån)</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Kostnad per tjänst (SEK/mån)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={costByService} layout="vertical" margin={{ left: 20 }}>
                 <XAxis type="number" tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
-                <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12 }} />
+                <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11 }} />
                 <Tooltip
                   formatter={(value) => [formatCurrency(Number(value)), 'Kostnad']}
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
                 />
-                <Bar dataKey="kostnad" radius={[0, 4, 4, 0]}>
+                <Bar dataKey="kostnad" radius={[0, 6, 6, 0]}>
                   {costByService.map((entry, i) => (
                     <Cell key={i} fill={entry.color} />
                   ))}
@@ -287,9 +250,9 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card animate-in-8">
           <CardHeader>
-            <CardTitle className="text-base">Kostnad per kategori</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Kostnad per kategori</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -298,14 +261,15 @@ export function Dashboard() {
                   data={costByCategory}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
+                  innerRadius={65}
+                  outerRadius={105}
                   paddingAngle={3}
                   dataKey="value"
+                  stroke="none"
                   label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 >
                   {costByCategory.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip formatter={(value) => [formatCurrency(Number(value)), 'Kostnad/mån']} />
@@ -317,15 +281,15 @@ export function Dashboard() {
 
       {/* Charts row 2 */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
-            <CardTitle className="text-base">Kostnadstrend (senaste 12 månader)</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Kostnadstrend (senaste 12 månader)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={historicalTrend}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <XAxis dataKey="month" />
                 <YAxis tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(value) => [formatCurrency(Number(value)), 'Total']} />
                 <Legend />
@@ -333,34 +297,40 @@ export function Dashboard() {
                   type="monotone"
                   dataKey="kostnad"
                   name="Kostnad (SEK)"
-                  stroke="#059669"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
+                  stroke="#38bdf8"
+                  strokeWidth={2.5}
+                  dot={{ r: 3, fill: '#38bdf8', strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: '#38bdf8', stroke: '#38bdf833', strokeWidth: 8 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
-            <CardTitle className="text-base">Kostnadsprognos (kommande 12 månader)</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Kostnadsprognos (kommande 12 månader)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={forecast}>
+                <defs>
+                  <linearGradient id="prognosGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <XAxis dataKey="month" />
                 <YAxis tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(value) => [formatCurrency(Number(value)), 'Prognos']} />
                 <Area
                   type="monotone"
                   dataKey="prognos"
                   name="Prognos (SEK)"
-                  stroke="#0891b2"
-                  fill="#0891b2"
-                  fillOpacity={0.1}
-                  strokeWidth={2}
+                  stroke="#a78bfa"
+                  fill="url(#prognosGradient)"
+                  strokeWidth={2.5}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -369,10 +339,10 @@ export function Dashboard() {
       </div>
 
       {/* Upcoming renewals */}
-      <Card>
+      <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <CalendarClock className="w-5 h-5" />
+          <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CalendarClock className="w-4 h-4 text-aurora-amber" />
             Kommande förnyelser (90 dagar)
           </CardTitle>
         </CardHeader>
@@ -380,23 +350,23 @@ export function Dashboard() {
           {upcomingRenewals.length === 0 ? (
             <p className="text-sm text-muted-foreground">Inga förnyelser inom 90 dagar</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-1">
               {upcomingRenewals.map(s => {
                 const daysLeft = Math.ceil(
                   (new Date(s.renewalDate!).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
                 );
                 return (
-                  <div key={s.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <div key={s.id} className="flex items-center justify-between py-3 border-b border-border last:border-0 group hover:bg-white/[0.02] rounded-lg px-2 -mx-2 transition-colors">
                     <div className="flex items-center gap-3">
                       <ServiceLogo name={s.name} color={s.logoColor} size="sm" />
                       <div>
                         <p className="font-medium text-sm">{s.name}</p>
-                        <p className="text-xs text-muted-foreground">{s.plan} · {s.billingCycle === 'monthly' ? 'Månadsvis' : 'Årsvis'}</p>
+                        <p className="text-[11px] text-muted-foreground">{s.plan} · {s.billingCycle === 'monthly' ? 'Månadsvis' : 'Årsvis'}</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium">{formatCurrency(s.cost, s.currency)}/{s.billingCycle === 'monthly' ? 'mån' : 'år'}</p>
-                      <p className={`text-xs ${daysLeft <= 14 ? 'text-red-500 font-medium' : daysLeft <= 30 ? 'text-amber-500' : 'text-muted-foreground'}`}>
+                      <p className={`text-[11px] font-medium ${daysLeft <= 14 ? 'text-aurora-rose' : daysLeft <= 30 ? 'text-aurora-amber' : 'text-muted-foreground'}`}>
                         {daysLeft <= 0 ? 'Idag' : `om ${daysLeft} dagar`}
                       </p>
                     </div>
@@ -407,13 +377,6 @@ export function Dashboard() {
           )}
         </CardContent>
       </Card>
-
-      <ServiceFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        service={null}
-        onSave={(service: SaaSService) => { addService(service); setFormOpen(false); }}
-      />
     </div>
   );
 }

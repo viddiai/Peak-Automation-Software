@@ -4,7 +4,6 @@ import { getMonthlyCostInSEK, formatCurrency } from '@/lib/currency';
 import { ServiceLogo } from '@/components/shared/ServiceLogo';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -15,12 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   TrendingDown,
   Users,
   Layers,
   UserX,
-  Download,
 } from 'lucide-react';
 import type { Category } from '@/types';
 
@@ -38,7 +37,6 @@ export function Savings() {
     return d;
   }, []);
 
-  // Low usage: services where active users < 50% of licenses
   const lowUsageServices = useMemo(() => {
     return activeServices
       .map(s => {
@@ -65,7 +63,6 @@ export function Savings() {
       .sort((a, b) => b.potentialSaving - a.potentialSaving);
   }, [activeServices, users, rates, cutoff]);
 
-  // Overlap: group by category
   const categoryOverlap = useMemo(() => {
     const map = new Map<Category, typeof activeServices>();
     for (const s of activeServices) {
@@ -83,7 +80,6 @@ export function Savings() {
       .sort((a, b) => b.totalMonthlyCost - a.totalMonthlyCost);
   }, [activeServices, rates]);
 
-  // Inactive licenses
   const inactiveLicenses = useMemo(() => {
     const result: {
       user: typeof users[0];
@@ -122,113 +118,63 @@ export function Savings() {
     [inactiveLicenses]
   );
 
-  const exportCSV = () => {
-    const headers = ['Tjänst', 'Användare', 'E-post', 'Dagar sedan inloggning', 'Beräknad besparing (SEK/mån)'];
-    const rows = inactiveLicenses.map(l => [
-      l.service.name,
-      l.user.name,
-      l.user.email,
-      l.daysSinceLogin.toString(),
-      l.estimatedSaving.toString(),
-    ]);
-    const csv = [headers, ...rows].map(r => r.join(';')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `besparingsrapport-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const summaryKpis = [
+    { label: 'Möjlig besparing/mån', value: formatCurrency(totalPotentialSavings), icon: TrendingDown, color: 'rose' as const },
+    { label: 'Tjänster med låg användning', value: lowUsageServices.length, icon: Users, color: 'amber' as const },
+    { label: 'Överlappande kategorier', value: categoryOverlap.length, icon: Layers, color: 'cyan' as const },
+    { label: 'Inaktiva licenser', value: inactiveLicenses.length, icon: UserX, color: 'violet' as const },
+  ];
+
+  const colorMap = {
+    rose: 'bg-aurora-rose/10 text-aurora-rose',
+    amber: 'bg-aurora-amber/10 text-aurora-amber',
+    cyan: 'bg-aurora-cyan/10 text-aurora-cyan',
+    violet: 'bg-aurora-violet/10 text-aurora-violet',
   };
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Besparingar & optimering</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Identifiera kostnadsbesparingar i din SaaS-portfölj
-          </p>
-        </div>
-        <Button variant="outline" onClick={exportCSV}>
-          <Download className="w-4 h-4 mr-2" /> Exportera rapport
-        </Button>
-      </div>
+      <PageHeader
+        title="Besparingar & optimering"
+        subtitle="Identifiera kostnadsbesparingar i din SaaS-portfölj"
+      />
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                <TrendingDown className="w-5 h-5 text-red-600" />
+        {summaryKpis.map((kpi, i) => (
+          <Card key={kpi.label} className={`glass-card animate-in-${i + 2}`}>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorMap[kpi.color].split(' ')[0]}`}>
+                  <kpi.icon className={`w-5 h-5 ${colorMap[kpi.color].split(' ')[1]}`} />
+                </div>
+                <div>
+                  <p className="text-xl font-bold tracking-tight">{kpi.value}</p>
+                  <p className="text-[11px] text-muted-foreground">{kpi.label}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xl font-bold">{formatCurrency(totalPotentialSavings)}</p>
-                <p className="text-xs text-muted-foreground">Möjlig besparing/mån</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                <Users className="w-5 h-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-xl font-bold">{lowUsageServices.length}</p>
-                <p className="text-xs text-muted-foreground">Tjänster med låg användning</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Layers className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-xl font-bold">{categoryOverlap.length}</p>
-                <p className="text-xs text-muted-foreground">Överlappande kategorier</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                <UserX className="w-5 h-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-xl font-bold">{inactiveLicenses.length}</p>
-                <p className="text-xs text-muted-foreground">Inaktiva licenser</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <Tabs defaultValue="low-usage">
-        <TabsList>
+      <Tabs defaultValue="low-usage" className="animate-in-6">
+        <TabsList className="bg-white/[0.04] border border-border/30">
           <TabsTrigger value="low-usage">Låg användning</TabsTrigger>
           <TabsTrigger value="overlap">Överlapp</TabsTrigger>
           <TabsTrigger value="inactive">Inaktiva licenser</TabsTrigger>
         </TabsList>
 
-        {/* Low Usage */}
         <TabsContent value="low-usage" className="space-y-4">
           {lowUsageServices.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
+            <Card className="glass-card">
+              <CardContent className="py-16 text-center text-muted-foreground">
                 Alla tjänster har en bra utnyttjandegrad!
               </CardContent>
             </Card>
           ) : (
             lowUsageServices.map(item => (
-              <Card key={item.service.id}>
+              <Card key={item.service.id} className="glass-card">
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -241,26 +187,26 @@ export function Savings() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{formatCurrency(item.monthlyCost)}/mån</p>
-                      <p className="text-sm text-red-500">
-                        Möjlig besparing: {formatCurrency(item.potentialSaving)}/mån
+                      <p className="font-semibold tabular-nums">{formatCurrency(item.monthlyCost)}/mån</p>
+                      <p className="text-sm text-aurora-rose font-medium">
+                        Besparing: {formatCurrency(item.potentialSaving)}/mån
                       </p>
                     </div>
                   </div>
                   <div className="mt-4 grid grid-cols-3 gap-4">
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Aktiva användare</p>
-                      <p className="font-medium">{item.activeUsers} av {item.service.totalLicenses} licenser</p>
+                      <p className="text-[11px] text-muted-foreground mb-1 uppercase tracking-wider">Aktiva</p>
+                      <p className="font-medium tabular-nums">{item.activeUsers} av {item.service.totalLicenses}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Utnyttjandegrad</p>
+                      <p className="text-[11px] text-muted-foreground mb-1 uppercase tracking-wider">Utnyttjandegrad</p>
                       <div className="flex items-center gap-2">
                         <Progress value={item.utilizationRate} className="h-2 flex-1" />
-                        <span className="text-sm font-medium text-red-500">{item.utilizationRate}%</span>
+                        <span className="text-sm font-semibold text-aurora-rose tabular-nums">{item.utilizationRate}%</span>
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Rekommendation</p>
+                      <p className="text-[11px] text-muted-foreground mb-1 uppercase tracking-wider">Rekommendation</p>
                       <p className="text-sm">
                         {item.utilizationRate < 20
                           ? 'Överväg att avsluta'
@@ -274,38 +220,37 @@ export function Savings() {
           )}
         </TabsContent>
 
-        {/* Overlap */}
         <TabsContent value="overlap" className="space-y-4">
           {categoryOverlap.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
+            <Card className="glass-card">
+              <CardContent className="py-16 text-center text-muted-foreground">
                 Inga överlappande kategorier hittades
               </CardContent>
             </Card>
           ) : (
             categoryOverlap.map(group => (
-              <Card key={group.category}>
+              <Card key={group.category} className="glass-card">
                 <CardHeader>
-                  <CardTitle className="text-base flex items-center justify-between">
-                    <span>{group.category} ({group.services.length} tjänster)</span>
-                    <Badge variant="secondary">{formatCurrency(group.totalMonthlyCost)}/mån</Badge>
+                  <CardTitle className="text-sm font-medium flex items-center justify-between">
+                    <span className="text-muted-foreground">{group.category} ({group.services.length} tjänster)</span>
+                    <Badge variant="secondary" className="bg-white/[0.06] text-foreground border-0 tabular-nums">{formatCurrency(group.totalMonthlyCost)}/mån</Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Dessa tjänster kan ha överlappande funktionalitet. Överväg att konsolidera.
                   </p>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     {group.services.map(s => (
-                      <div key={s.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                      <div key={s.id} className="flex items-center justify-between py-3 border-b border-border/20 last:border-0 group hover:bg-white/[0.02] rounded-lg px-2 -mx-2 transition-colors">
                         <div className="flex items-center gap-3">
                           <ServiceLogo name={s.name} color={s.logoColor} size="sm" />
                           <div>
                             <p className="text-sm font-medium">{s.name}</p>
-                            <p className="text-xs text-muted-foreground">{s.vendor} · {s.plan}</p>
+                            <p className="text-[11px] text-muted-foreground">{s.vendor} · {s.plan}</p>
                           </div>
                         </div>
-                        <p className="text-sm font-medium">{formatCurrency(getMonthlyCostInSEK(s, rates))}/mån</p>
+                        <p className="text-sm font-semibold tabular-nums">{formatCurrency(getMonthlyCostInSEK(s, rates))}/mån</p>
                       </div>
                     ))}
                   </div>
@@ -315,37 +260,36 @@ export function Savings() {
           )}
         </TabsContent>
 
-        {/* Inactive Licenses */}
         <TabsContent value="inactive">
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
-              <CardTitle className="text-base">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 Inaktiva licenser ({inactiveLicenses.length})
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {inactiveLicenses.length === 0 ? (
-                <p className="text-muted-foreground text-center py-12">
+                <p className="text-muted-foreground text-center py-16">
                   Alla användare är aktiva!
                 </p>
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Användare</TableHead>
-                      <TableHead>Tjänst</TableHead>
-                      <TableHead>Licensnivå</TableHead>
-                      <TableHead>Dagar sedan inloggning</TableHead>
-                      <TableHead>Beräknad besparing</TableHead>
+                    <TableRow className="border-border/30 hover:bg-transparent">
+                      <TableHead className="text-[11px] uppercase tracking-wider">Användare</TableHead>
+                      <TableHead className="text-[11px] uppercase tracking-wider">Tjänst</TableHead>
+                      <TableHead className="text-[11px] uppercase tracking-wider">Licensnivå</TableHead>
+                      <TableHead className="text-[11px] uppercase tracking-wider">Dagar sedan inloggning</TableHead>
+                      <TableHead className="text-[11px] uppercase tracking-wider">Beräknad besparing</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {inactiveLicenses.map((l, i) => (
-                      <TableRow key={i}>
+                      <TableRow key={i} className="border-border/20">
                         <TableCell>
                           <div>
                             <p className="font-medium text-sm">{l.user.name}</p>
-                            <p className="text-xs text-muted-foreground">{l.user.email}</p>
+                            <p className="text-[11px] text-muted-foreground">{l.user.email}</p>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -355,14 +299,14 @@ export function Savings() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="text-xs">{l.user.licenseTier}</Badge>
+                          <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">{l.user.licenseTier}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="destructive" className="text-xs">
+                          <Badge variant="destructive" className="text-[10px]">
                             {l.daysSinceLogin >= 999 ? 'Aldrig' : `${l.daysSinceLogin} dagar`}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-medium text-red-500">
+                        <TableCell className="font-semibold text-aurora-rose tabular-nums">
                           {formatCurrency(l.estimatedSaving)}/mån
                         </TableCell>
                       </TableRow>
