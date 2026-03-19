@@ -26,7 +26,7 @@ export function Sidebar() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <aside className="hidden md:flex flex-col w-[260px] border-r border-border bg-sidebar h-screen sticky top-0">
+    <aside className="hidden md:flex flex-col w-[260px] shrink-0 border-r border-border bg-sidebar h-screen sticky top-0 relative z-20">
       {/* Brand */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-border">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-aurora-cyan to-aurora-violet flex items-center justify-center shadow-lg glow-cyan">

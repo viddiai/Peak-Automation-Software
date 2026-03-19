@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ServiceFormDialog } from '@/components/services/ServiceFormDialog';
 import { useAppData } from '@/hooks/useAppData';
-import { Plus, List, Upload, PiggyBank, Download } from 'lucide-react';
+import { Plus, LayoutDashboard, List, Upload, PiggyBank, Download } from 'lucide-react';
 import { exportServicesToCSV } from '@/lib/exportCSV';
 import type { SaaSService } from '@/types';
 
@@ -30,6 +30,9 @@ export function PageHeader({ title, subtitle }: PageHeaderProps) {
             onClick={() => setFormOpen(true)}
           >
             <Plus className="w-4 h-4 mr-2" /> Lägg till tjänst
+          </Button>
+          <Button variant="outline" className="border-border/60 text-muted-foreground hover:text-foreground hover:border-border" onClick={() => navigate('/')}>
+            <LayoutDashboard className="w-4 h-4 mr-2" /> Översikt
           </Button>
           <Button variant="outline" className="border-border/60 text-muted-foreground hover:text-foreground hover:border-border" onClick={() => navigate('/tjanster')}>
             <List className="w-4 h-4 mr-2" /> Alla tjänster
