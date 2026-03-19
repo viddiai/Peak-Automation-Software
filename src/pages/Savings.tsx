@@ -159,7 +159,7 @@ export function Savings() {
       </div>
 
       <Tabs defaultValue="low-usage" className="animate-in-6">
-        <TabsList className="bg-white/[0.04] border border-border/30">
+        <TabsList className="bg-surface-2 border border-border/30">
           <TabsTrigger value="low-usage">Låg användning</TabsTrigger>
           <TabsTrigger value="overlap">Överlapp</TabsTrigger>
           <TabsTrigger value="inactive">Inaktiva licenser</TabsTrigger>
@@ -233,7 +233,7 @@ export function Savings() {
                 <CardHeader>
                   <CardTitle className="text-sm font-medium flex items-center justify-between">
                     <span className="text-muted-foreground">{group.category} ({group.services.length} tjänster)</span>
-                    <Badge variant="secondary" className="bg-white/[0.06] text-foreground border-0 tabular-nums">{formatCurrency(group.totalMonthlyCost)}/mån</Badge>
+                    <Badge variant="secondary" className="bg-surface-3 text-foreground border-0 tabular-nums">{formatCurrency(group.totalMonthlyCost)}/mån</Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -242,7 +242,7 @@ export function Savings() {
                   </p>
                   <div className="space-y-1">
                     {group.services.map(s => (
-                      <div key={s.id} className="flex items-center justify-between py-3 border-b border-border/20 last:border-0 group hover:bg-white/[0.02] rounded-lg px-2 -mx-2 transition-colors">
+                      <div key={s.id} className="flex items-center justify-between py-3 border-b border-border/20 last:border-0 group hover:bg-surface-1 rounded-lg px-2 -mx-2 transition-colors">
                         <div className="flex items-center gap-3">
                           <ServiceLogo name={s.name} color={s.logoColor} size="sm" />
                           <div>

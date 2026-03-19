@@ -115,7 +115,7 @@ export function ServiceFormDialog({ open, onOpenChange, service, onSave }: Servi
     onOpenChange(false);
   };
 
-  const inputClass = "bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40";
+  const inputClass = "bg-surface-2 border-border/50 focus:border-aurora-cyan/40";
   const labelClass = "text-[11px] uppercase tracking-wider text-muted-foreground font-medium";
 
   return (

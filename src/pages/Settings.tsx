@@ -53,7 +53,7 @@ export function Settings() {
           <div className="space-y-2">
             <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Företagsnamn</Label>
             <Input
-              className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+              className="bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
               value={form.companyName}
               onChange={e => setForm(f => ({ ...f, companyName: e.target.value }))}
             />
@@ -64,7 +64,7 @@ export function Settings() {
               value={form.defaultCurrency}
               onValueChange={v => { if (v) setForm(f => ({ ...f, defaultCurrency: v as Currency })); }}
             >
-              <SelectTrigger className="w-[120px] bg-white/[0.04] border-border/50">
+              <SelectTrigger className="w-[120px] bg-surface-2 border-border/50">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -91,7 +91,7 @@ export function Settings() {
               <Input
                 type="number"
                 step="0.01"
-                className="bg-white/[0.04] border-border/50"
+                className="bg-surface-2 border-border/50"
                 value={form.exchangeRates.SEK}
                 disabled
               />
@@ -101,7 +101,7 @@ export function Settings() {
               <Input
                 type="number"
                 step="0.01"
-                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+                className="bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
                 value={form.exchangeRates.EUR}
                 onChange={e =>
                   setForm(f => ({
@@ -117,7 +117,7 @@ export function Settings() {
               <Input
                 type="number"
                 step="0.01"
-                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+                className="bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
                 value={form.exchangeRates.USD}
                 onChange={e =>
                   setForm(f => ({

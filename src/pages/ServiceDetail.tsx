@@ -175,11 +175,11 @@ export function ServiceDetail() {
             <div className="flex gap-2 mt-2">
               <Badge
                 variant={service.status === 'active' ? 'default' : 'secondary'}
-                className={service.status === 'active' ? 'bg-aurora-teal/15 text-aurora-teal border-0' : 'bg-white/[0.06] text-muted-foreground border-0'}
+                className={service.status === 'active' ? 'bg-aurora-teal/15 text-aurora-teal border-0' : 'bg-surface-3 text-muted-foreground border-0'}
               >
                 {service.status === 'active' ? 'Aktiv' : 'Inaktiv'}
               </Badge>
-              <Badge variant="secondary" className="bg-white/[0.06] text-muted-foreground border-0">{service.category}</Badge>
+              <Badge variant="secondary" className="bg-surface-3 text-muted-foreground border-0">{service.category}</Badge>
               {service.tags.map(t => (
                 <Badge key={t} variant="outline" className="text-[10px] border-border/50 text-muted-foreground">{t}</Badge>
               ))}
@@ -270,7 +270,7 @@ export function ServiceDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="licenses" className="space-y-4 animate-in-8">
-        <TabsList className="bg-white/[0.04] border border-border/30">
+        <TabsList className="bg-surface-2 border border-border/30">
           <TabsTrigger value="licenses">Licenser ({service.totalLicenses})</TabsTrigger>
           <TabsTrigger value="users">Användare ({serviceUsers.length})</TabsTrigger>
           <TabsTrigger value="cost">Kostnadshistorik</TabsTrigger>
@@ -296,7 +296,7 @@ export function ServiceDetail() {
                   <Input
                     type="number"
                     min={0}
-                    className="w-20 h-8 text-center bg-white/[0.04] border-border/50"
+                    className="w-20 h-8 text-center bg-surface-2 border-border/50"
                     value={service.totalLicenses}
                     onChange={e => editService(service.id, { totalLicenses: Math.max(0, parseInt(e.target.value) || 0) })}
                   />
@@ -313,28 +313,28 @@ export function ServiceDetail() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-border/20">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-1 border border-border/20">
                   <KeyRound className="w-5 h-5 text-aurora-cyan" />
                   <div>
                     <p className="text-lg font-bold tabular-nums">{service.totalLicenses}</p>
                     <p className="text-[11px] text-muted-foreground">Totalt licenser</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-border/20">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-1 border border-border/20">
                   <UserCheck className="w-5 h-5 text-aurora-teal" />
                   <div>
                     <p className="text-lg font-bold tabular-nums">{activeUsers.length}</p>
                     <p className="text-[11px] text-muted-foreground">Aktiva tilldelade</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-border/20">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-1 border border-border/20">
                   <UserMinus className="w-5 h-5 text-aurora-amber" />
                   <div>
                     <p className="text-lg font-bold tabular-nums">{inactiveUsers.length}</p>
                     <p className="text-[11px] text-muted-foreground">Inaktiva tilldelade</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-border/20">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-1 border border-border/20">
                   <KeyRound className="w-5 h-5 text-muted-foreground/40" />
                   <div>
                     <p className="text-lg font-bold tabular-nums">{Math.max(0, service.totalLicenses - serviceUsers.length)}</p>
@@ -349,7 +349,7 @@ export function ServiceDetail() {
                   <span>Utnyttjande</span>
                   <span className="tabular-nums">{utilization}%</span>
                 </div>
-                <div className="h-3 bg-white/[0.04] rounded-full overflow-hidden flex">
+                <div className="h-3 bg-surface-2 rounded-full overflow-hidden flex">
                   {service.totalLicenses > 0 && (
                     <>
                       <div
@@ -373,13 +373,13 @@ export function ServiceDetail() {
                     <span className="w-2 h-2 rounded-full bg-aurora-amber" /> Inaktiva ({inactiveUsers.length})
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-white/10" /> Lediga ({Math.max(0, service.totalLicenses - serviceUsers.length)})
+                    <span className="w-2 h-2 rounded-full bg-surface-4" /> Lediga ({Math.max(0, service.totalLicenses - serviceUsers.length)})
                   </span>
                 </div>
               </div>
 
               {service.totalLicenses > 0 && (
-                <div className="mt-6 p-4 border border-border/30 rounded-xl bg-white/[0.02]">
+                <div className="mt-6 p-4 border border-border/30 rounded-xl bg-surface-1">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-sm font-medium">Kostnad per licens</p>
@@ -452,7 +452,7 @@ export function ServiceDetail() {
                               {isInactive ? 'Inaktiv' : 'Aktiv'}
                             </Badge>
                           ) : (
-                            <Badge variant="secondary" className="bg-white/[0.04] text-muted-foreground/50 border-0 text-[10px]">Ej tilldelad</Badge>
+                            <Badge variant="secondary" className="bg-surface-2 text-muted-foreground/50 border-0 text-[10px]">Ej tilldelad</Badge>
                           )}
                         </TableCell>
                       </TableRow>
@@ -664,7 +664,7 @@ export function ServiceDetail() {
               ) : (
                 <div className="space-y-3">
                   {service.notes.map(n => (
-                    <div key={n.id} className="flex items-start justify-between p-4 border border-border/30 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                    <div key={n.id} className="flex items-start justify-between p-4 border border-border/30 rounded-xl bg-surface-1 hover:bg-surface-2 transition-colors">
                       <div>
                         <p className="text-sm">{n.text}</p>
                         {n.url && (
@@ -714,7 +714,7 @@ export function ServiceDetail() {
             <div className="space-y-2">
               <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Namn *</Label>
               <Input
-                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+                className="bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
                 value={newUser.name}
                 onChange={e => setNewUser(u => ({ ...u, name: e.target.value }))}
                 placeholder="t.ex. Anna Lindberg"
@@ -724,7 +724,7 @@ export function ServiceDetail() {
               <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">E-post</Label>
               <Input
                 type="email"
-                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+                className="bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
                 value={newUser.email}
                 onChange={e => setNewUser(u => ({ ...u, email: e.target.value }))}
                 placeholder="anna@foretaget.se"
@@ -733,7 +733,7 @@ export function ServiceDetail() {
             <div className="space-y-2">
               <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Licensnivå</Label>
               <Input
-                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+                className="bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
                 value={newUser.licenseTier}
                 onChange={e => setNewUser(u => ({ ...u, licenseTier: e.target.value }))}
                 placeholder={service.plan}
@@ -759,7 +759,7 @@ export function ServiceDetail() {
             <div className="space-y-2">
               <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Text *</Label>
               <Textarea
-                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+                className="bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
                 value={newNote.text}
                 onChange={e => setNewNote(n => ({ ...n, text: e.target.value }))}
                 placeholder="Skriv en anteckning..."
@@ -769,7 +769,7 @@ export function ServiceDetail() {
             <div className="space-y-2">
               <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Länk (valfritt)</Label>
               <Input
-                className="bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+                className="bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
                 value={newNote.url}
                 onChange={e => setNewNote(n => ({ ...n, url: e.target.value }))}
                 placeholder="https://..."

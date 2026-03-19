@@ -140,13 +140,13 @@ export function Services() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Sök på namn eller leverantör..."
-                className="pl-9 bg-white/[0.04] border-border/50 focus:border-aurora-cyan/40"
+                className="pl-9 bg-surface-2 border-border/50 focus:border-aurora-cyan/40"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
             <Select value={categoryFilter} onValueChange={v => setCategoryFilter(v ?? 'all')}>
-              <SelectTrigger className="w-[160px] bg-white/[0.04] border-border/50">
+              <SelectTrigger className="w-[160px] bg-surface-2 border-border/50">
                 <SelectValue placeholder="Kategori" />
               </SelectTrigger>
               <SelectContent>
@@ -157,7 +157,7 @@ export function Services() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={v => setStatusFilter(v ?? 'all')}>
-              <SelectTrigger className="w-[130px] bg-white/[0.04] border-border/50">
+              <SelectTrigger className="w-[130px] bg-surface-2 border-border/50">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -167,7 +167,7 @@ export function Services() {
               </SelectContent>
             </Select>
             <Select value={responsibleFilter} onValueChange={v => setResponsibleFilter(v ?? 'all')}>
-              <SelectTrigger className="w-[160px] bg-white/[0.04] border-border/50">
+              <SelectTrigger className="w-[160px] bg-surface-2 border-border/50">
                 <SelectValue placeholder="Ansvarig" />
               </SelectTrigger>
               <SelectContent>
@@ -225,7 +225,7 @@ export function Services() {
                   return (
                     <TableRow
                       key={s.id}
-                      className="cursor-pointer border-border/30 hover:bg-white/[0.03] transition-colors"
+                      className="cursor-pointer border-border/30 hover:bg-surface-1 transition-colors"
                       onClick={() => navigate(`/tjanster/${s.id}`)}
                     >
                       <TableCell>
@@ -238,7 +238,7 @@ export function Services() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className="text-[10px] bg-white/[0.06] text-muted-foreground border-0">{s.category}</Badge>
+                        <Badge variant="secondary" className="text-[10px] bg-surface-3 text-muted-foreground border-0">{s.category}</Badge>
                       </TableCell>
                       <TableCell className="font-semibold text-sm tabular-nums">
                         {formatCurrency(monthlyCost)}
@@ -259,7 +259,7 @@ export function Services() {
                           variant={s.status === 'active' ? 'default' : 'secondary'}
                           className={s.status === 'active'
                             ? 'bg-aurora-teal/15 text-aurora-teal border-0 text-[10px]'
-                            : 'bg-white/[0.06] text-muted-foreground border-0 text-[10px]'}
+                            : 'bg-surface-3 text-muted-foreground border-0 text-[10px]'}
                         >
                           {s.status === 'active' ? 'Aktiv' : 'Inaktiv'}
                         </Badge>
@@ -267,7 +267,7 @@ export function Services() {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger
-                            className="inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-white/[0.06] transition-colors"
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-surface-3 transition-colors"
                             onClick={e => e.stopPropagation()}
                           >
                             <MoreVertical className="w-4 h-4 text-muted-foreground" />

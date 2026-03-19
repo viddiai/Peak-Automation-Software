@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Sparkles } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Sparkles, Sun, Moon } from 'lucide-react';
 
 export function Login() {
   const { signInWithGoogle } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -24,6 +26,15 @@ export function Login() {
 
   return (
     <div className="min-h-screen bg-background aurora-bg grain-overlay flex items-center justify-center p-4">
+      {/* Theme toggle */}
+      <button
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 z-20 p-2.5 rounded-xl bg-surface-2 border border-border/50 text-muted-foreground hover:text-foreground transition-colors"
+        title={theme === 'dark' ? 'Ljust läge' : 'Mörkt läge'}
+      >
+        {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      </button>
+
       <div className="relative z-10 w-full max-w-sm">
         {/* Glass card */}
         <div className="glass-card rounded-2xl p-8 text-center">
@@ -45,7 +56,7 @@ export function Login() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-white/[0.06] border border-border/50 hover:bg-white/[0.10] hover:border-border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-surface-3 border border-border/50 hover:bg-surface-4 hover:border-border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
           >
             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>

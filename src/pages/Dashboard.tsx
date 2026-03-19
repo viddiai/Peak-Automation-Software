@@ -356,7 +356,7 @@ export function Dashboard() {
                   (new Date(s.renewalDate!).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
                 );
                 return (
-                  <div key={s.id} className="flex items-center justify-between py-3 border-b border-border last:border-0 group hover:bg-white/[0.02] rounded-lg px-2 -mx-2 transition-colors">
+                  <div key={s.id} className="flex items-center justify-between py-3 border-b border-border last:border-0 group hover:bg-surface-1 rounded-lg px-2 -mx-2 transition-colors">
                     <div className="flex items-center gap-3">
                       <ServiceLogo name={s.name} color={s.logoColor} size="sm" />
                       <div>

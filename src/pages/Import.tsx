@@ -216,7 +216,7 @@ export function Import() {
                     ? 'bg-aurora-cyan text-background font-semibold'
                     : isDone
                     ? 'bg-aurora-teal/15 text-aurora-teal border-0'
-                    : 'bg-white/[0.04] text-muted-foreground border-0'
+                    : 'bg-surface-2 text-muted-foreground border-0'
                 }
               >
                 {isDone ? <Check className="w-3 h-3 mr-1" /> : null}
@@ -270,7 +270,7 @@ export function Import() {
               <div className="space-y-2">
                 <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Datum</Label>
                 <Select value={mapping.date} onValueChange={v => setMapping(m => ({ ...m, date: v ?? '' }))}>
-                  <SelectTrigger className="bg-white/[0.04] border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
+                  <SelectTrigger className="bg-surface-2 border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
                   <SelectContent>
                     {headers.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
                   </SelectContent>
@@ -279,7 +279,7 @@ export function Import() {
               <div className="space-y-2">
                 <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Beskrivning *</Label>
                 <Select value={mapping.description} onValueChange={v => setMapping(m => ({ ...m, description: v ?? '' }))}>
-                  <SelectTrigger className="bg-white/[0.04] border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
+                  <SelectTrigger className="bg-surface-2 border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
                   <SelectContent>
                     {headers.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
                   </SelectContent>
@@ -288,7 +288,7 @@ export function Import() {
               <div className="space-y-2">
                 <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Belopp *</Label>
                 <Select value={mapping.amount} onValueChange={v => setMapping(m => ({ ...m, amount: v ?? '' }))}>
-                  <SelectTrigger className="bg-white/[0.04] border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
+                  <SelectTrigger className="bg-surface-2 border-border/50"><SelectValue placeholder="Välj kolumn" /></SelectTrigger>
                   <SelectContent>
                     {headers.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
                   </SelectContent>
