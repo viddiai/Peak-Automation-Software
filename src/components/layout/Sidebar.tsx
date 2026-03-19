@@ -28,23 +28,14 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-[260px] border-r border-border bg-sidebar h-screen sticky top-0">
       {/* Brand */}
-      <div className="flex items-center justify-between px-6 py-6 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-aurora-cyan to-aurora-violet flex items-center justify-center shadow-lg glow-cyan">
-            <Sparkles className="w-4.5 h-4.5 text-white" />
-          </div>
-          <div>
-            <span className="font-serif text-lg tracking-tight text-foreground">SaaS</span>
-            <span className="font-serif text-lg tracking-tight text-aurora-cyan">översikt</span>
-          </div>
+      <div className="flex items-center gap-3 px-6 py-6 border-b border-border">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-aurora-cyan to-aurora-violet flex items-center justify-center shadow-lg glow-cyan">
+          <Sparkles className="w-4.5 h-4.5 text-white" />
         </div>
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors"
-          title={theme === 'dark' ? 'Ljust läge' : 'Mörkt läge'}
-        >
-          {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </button>
+        <div>
+          <span className="font-serif text-lg tracking-tight text-foreground">SaaS</span>
+          <span className="font-serif text-lg tracking-tight text-aurora-cyan">översikt</span>
+        </div>
       </div>
 
       {/* Navigation */}
@@ -76,6 +67,17 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      {/* Theme toggle */}
+      <div className="px-3 pb-3">
+        <button
+          onClick={toggleTheme}
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-all duration-200"
+        >
+          {theme === 'dark' ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+          {theme === 'dark' ? 'Ljust läge' : 'Mörkt läge'}
+        </button>
+      </div>
 
       {/* User + logout */}
       <div className="px-4 py-4 border-t border-border">
